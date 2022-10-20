@@ -6,5 +6,6 @@ First, you have to install python
 Then install the google API library
 >> pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
 
-After that download, the client_secret.json from google cloud console, then go to API and services, then credentials,
-and download your client OAuth key put it in the program's folder, change its name to client_secret and run the program.
+After that, you will need to download the client_secret.json. You can do that by opening google cloud console, then going to API and services, then credentials and downloading the client OAuth key. 
+
+Then, put the file you downloaded in the same folder as the code, rename it to "client_secret.json" and it's done.
