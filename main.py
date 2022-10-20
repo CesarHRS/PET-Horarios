@@ -1,16 +1,12 @@
 from __future__ import print_function
 
 import os.path
-import pickle
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
-import pdfkit
-import json
 
 # Se quiser adicionar permicao de ler apenas, basta adicionar um .readonly no fim.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
@@ -45,55 +41,6 @@ def main():
         sheet = service.spreadsheets()
         # Salva as informacoes em result como um dicionario
         result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID, range=SAMPLE_RANGE_NAME).execute()
-
-        # retorna:
-        # {'range': 'Respostas!B2:AF10', 'majorDimension': 'ROWS', 'values': [
-        #    ['Kleber Rodrigo da Silva Junior ', 'Bolsista', 'kleberjunior1999@gmail.com', 'Terça, Quinta, Sexta',
-        #     'Terça, Quinta, Sexta', '', '', '', '', '', '', '', 'Quinta', 'Quinta', 'Quinta', '', '' // limite do lab presencial i >=18 //, 'Segunda',
-        #     'Segunda', 'Segunda', 'Segunda', '', '', '', '', '', 'Quarta', 'Quarta', 'Quarta', 'Quarta', 'Quarta'],
-        #
-        #    ['Mateus Alves de Sales', 'Bolsista', 'mateusalvesdesales@outlook.com', '', '', 'Terça, Sexta',
-        #     'Terça, Sexta', 'Segunda', 'Segunda', 'Segunda, Terça, Sexta', '', '', '', '', '', '', '', '', '', '', '',
-        #     '', '', '', '', 'Quarta, Quinta', 'Quarta, Quinta', 'Quarta, Quinta', 'Segunda', 'Segunda', 'Segunda'],
-        #
-        #    ['Erick Nathan Martins Alves', 'Bolsista', 'ericknathancoro@hotmail.com', 'Quarta', 'Quarta', '', '', '',
-        #     '', 'Segunda, Terça, Quarta, Quinta, Sexta', 'Quarta, Sexta', '', '', '', '', '', '', '', '', '', '', '',
-        #     '', '', '', '', '', '', '', 'Segunda, Terça, Quarta, Quinta, Sexta',
-        #     'Segunda, Terça, Quarta, Quinta, Sexta'],
-        #
-        #    ['Victor Sidnei Cotta', 'Voluntário', 'vctrsdn@gmail.com', '', '', '', '', '', '', '', 'Quarta', 'Quarta',
-        #     'Quarta, Quinta', 'Quarta', '', '', '', '', '', '', '', '', '', '', 'Sexta', 'Sexta', 'Segunda',
-        #    'Segunda'],
-        #
-        #    ['Thiago Henrique de Faria Costa', 'Voluntário', 'tfariacosta@icloud.com', '', '', '', '', '', '', '',
-        #    'Quarta', 'Quarta', 'Quarta, Sexta', 'Quarta', '', '', '', '', 'Segunda, Terça, Quarta, Quinta'],
-        #
-        #    ['Márcio Guilherme Silvestrini Júnior ', 'Bolsista', 'marcioguilherme712@gmail.com', '', '', 'Terça',
-        #     'Terça', '', '', 'Sexta', 'Sexta', 'Sexta', 'Sexta', 'Sexta', 'Sexta', 'Terça', '', '', '', '', '', '',
-        #     '', 'Segunda', 'Segunda', 'Segunda', 'Segunda', 'Segunda', 'Segunda', 'Segunda', 'Segunda, Terça'],
-        #
-        #    ['Robson Resende Teixeira Junior', 'Voluntário', 'robsonresende55@yahoo.com.br', '', '', '', '', '', '',
-        #    '', 'Quarta', 'Quarta', 'Segunda, Quinta', '', 'Terça', '', '', '', '', '', '', '', '', 'Sexta', 'Sexta',
-        #    '', '', 'Segunda', 'Segunda'],
-        #
-        #    ['César Henrique Resende Soares', 'Voluntário', 'cesarresende.soares@outlook.com', '', '', '', '', '', '',
-        #     '', 'Terça, Sexta', 'Terça, Sexta', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
-        #     'Segunda, Terça', 'Segunda, Terça'],
-        #
-        #    ['Rafael Guimarães Gontijo', 'Voluntário', 'rafaelg000@gmail.com', '', '', '', '', '', '', '',
-        #     'Terça, Sexta', 'Terça, Sexta', '', '', '', '', '', '', '', '', '', '', '', '', 'Quarta', 'Quarta',
-        #     'Segunda, Sexta', 'Segunda']
-        #     ]}
-        # Tudo que e escrito em horario, futuramente sera escrito na tabela
-
-        # (sendo X um int que conta a quantidade de alunos cadastrados (tambem sera utilizado para identificar o aluno),
-        # sendo calculado por um loop que vai desde B2,passando por B3, B4, Bn, ate sheet.values() == '')
-        # percorrer B de 2 ate X , em cada iteracao, conferir nas colunas E ate R para os dias e horario de presença no
-        # lab e de S ate AF para os dias e horario de serviço online,
-        # Ao achar o dia e horario de trabalho de cada participante, adicionar seu nome, dado por B(X) e adiciona-lo na
-        # respectiva linha e coluna dentro do dicionario abaixo:
-        # Lembrete: fazer isso por meio de comandos do google sheets, nao manualmente, para isso, basta escrever o
-        # comando entre as "".
 
         # Preenchendo as colunas finais para que todas tenham 31 colunas
         for aluno in result['values']:
@@ -200,31 +147,16 @@ def main():
 
         print('\n-------------------------\n')
 
-        """
-        # Imprimindo a saída
-        for i in output:
-        	for j in i:
-        		print(j, end = '\t\t')
-        	print('')
-        """
         for l in output:
             if len(l) == 6:
                 hora, segunda, terca, quarta, quinta, sexta = l
                 print('{:<15} {:<40} {:<40} {:<40} {:<40} {:<40}'.format(hora, segunda, terca, quarta, quinta, sexta))
 
-        # Escreve horario na tabela tendo como ponto de inicio A20
+        # Escreve o resultado na página Formatado, a partir de A1
         result = sheet.values().update(spreadsheetId=SAMPLE_SPREADSHEET_ID, range="Formatado!A1", valueInputOption="USER_ENTERED"
                                         , body={'values': output}).execute()
     except HttpError as err:
         print(err)
-
-    f = open("imprimir.pdf", "w")
-    f.write(str(output))
-    f.close()
-
-
-    pdfkit.from_string(json.dumps(output))
-
 
 if __name__ == '__main__':
     main()
