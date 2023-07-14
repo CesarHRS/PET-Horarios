@@ -37,3 +37,7 @@ To execute the program, you just need to run main.py, which can be done by openi
 
 >> $ ./main.py
 
+# Conclusion
+
+The Script worked as expected, and for the years to come it will not going to be necessary to lose time manually formatting the timetable anymore. But, for me, the major positive of this project was improving my scripting skills with Python and learning how Google APIs worked. 
+
